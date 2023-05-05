@@ -59,13 +59,16 @@ class App(customtkinter.CTk):
         self.tabview.tab("DB SEARCH").grid_columnconfigure(0, weight=1)  
 
         self.optionmenu_1 = customtkinter.CTkOptionMenu(self.tabview.tab("DB SEARCH"), dynamic_resizing=False,
-                                                        values=["liiga1", "liiga2", "liiga3"])
+                                                        values=["Serie A", "Ligue 1", "Premier League", "Veikkausliiga", "World Cup", "Euro Cup", "LaLiga", "Bundesliga", "Champions", "Allsvenskan"])
         self.optionmenu_1.grid(row=0, column=0, padx=20, pady=(20, 10))
         self.combobox_1 = customtkinter.CTkComboBox(self.tabview.tab("DB SEARCH"),
                                                     values=["joukkue1", "joukku2", "joukkue3"])
         self.combobox_1.grid(row=1, column=0, padx=20, pady=(10, 10))
-        self.button_12 = customtkinter.CTkButton(self.tabview.tab("DB SEARCH"), command=self.sidebar_button_event, text="SEARCH")
+
+        self.button_12 = customtkinter.CTkButton(self.tabview.tab("DB SEARCH"), 
+                                                command=self.sidebar_button_event, text="SEARCH")
         self.button_12.grid(row=2, column=0, padx=20, pady=10)
+
         self.string_input_button = customtkinter.CTkButton(self.tabview.tab("DB SEARCH"), text="Search by keyword",
                                                            command=self.open_input_dialog_event)
         self.string_input_button.grid(row=3, column=0, padx=20, pady=(10, 10))
@@ -75,9 +78,20 @@ class App(customtkinter.CTk):
         self.tabview.grid(row=0, column=3, padx=(20, 0), pady=(20, 0), sticky="nsew")
         self.tabview.add("DB ADD")
         self.tabview.tab("DB ADD").grid_columnconfigure(0, weight=1)  
-        self.string_input_button = customtkinter.CTkButton(self.tabview.tab("DB ADD"), text="LISÄÄ",
-                                                           command=self.open_input_dialog_event)
+
+        self.string_input_button = customtkinter.CTkButton(self.tabview.tab("DB ADD"), text="ADD PLAYER",
+                                                           command=self.open_player_dialog)
         self.string_input_button.grid(row=2, column=0, padx=20, pady=(10, 10))
+
+
+        self.string_input_button = customtkinter.CTkButton(self.tabview.tab("DB ADD"), text="ADD TEAM",
+                                                           command=self.open_team_dialog)
+        self.string_input_button.grid(row=3, column=0, padx=20, pady=(10, 10))
+
+
+        self.string_input_button = customtkinter.CTkButton(self.tabview.tab("DB ADD"), text="ADD COMMENT",
+                                                           command=self.open_match_dialog)
+        self.string_input_button.grid(row=4, column=0, padx=20, pady=(10, 10))
 
         # set default values
         self.sidebar_button_3.configure(state="disabled", text="Älä paina tätä nappia")
@@ -87,8 +101,31 @@ class App(customtkinter.CTk):
         self.combobox_1.set("empty")
         self.textbox.insert("0.0", "Tähän tulee tietoja haetun kohteen attribuuteista\n\n")
 
+
+
+    # DIALOGS
     def open_input_dialog_event(self):
-        dialog = customtkinter.CTkInputDialog(text="Type in a number:", title="CTkInputDialog")
+        dialog = customtkinter.CTkInputDialog(text="Keyword:", title="SEARCH")
+        print("CTkInputDialog:", dialog.get_input())
+
+    def open_player_dialog(self):
+        prompts = [("Name of the player:", "Add a player to DB"), 
+               ("Age of the player:", "Add a player to DB"), 
+               ("Position of the player:", "Add a player to DB")]
+
+        inputs = []
+        for prompt in prompts:
+            dialog = customtkinter.CTkInputDialog(text=prompt[0], title=prompt[1])
+            inputs.append(dialog.get_input())
+    
+        print("Inputs:", inputs)
+
+    def open_team_dialog(self):
+        dialog = customtkinter.CTkInputDialog(text="Name of the team:", title="Add a team to DB")
+        print("CTkInputDialog:", dialog.get_input())
+
+    def open_match_dialog(self):
+        dialog = customtkinter.CTkInputDialog(text="Your comment:", title="Add comment on the team")
         print("CTkInputDialog:", dialog.get_input())
 
     def change_appearance_mode_event(self, new_appearance_mode: str):
@@ -100,14 +137,70 @@ class App(customtkinter.CTk):
 
     def sidebar_button_event(self):
         self.textbox.delete("1.0", "end")
+        if self.optionmenu_1.get() == "Serie A":
+            cursor2 = conn.cursor()
+            cursor2.execute("select * from league WHERE name = 'Serie A'")
+            results2 = cursor2.fetchall()
+            self.textbox.insert("1.0", results2)
+        elif self.optionmenu_1.get() == "Ligue 1":
+            cursor3 = conn.cursor()
+            cursor3.execute("select * from league WHERE name = 'Ligue 1'")
+            results3 = cursor3.fetchall()
+            self.textbox.insert("1.0", results3)
+        
+        elif self.optionmenu_1.get() == "Premier League":
+            cursor4 = conn.cursor()
+            cursor4.execute("select * from league WHERE name = 'Premier League'")
+            results4 = cursor4.fetchall()
+            self.textbox.insert("1.0", results4)
+        elif self.optionmenu_1.get() == "Veikkausliiga":
+            cursor5 = conn.cursor()
+            cursor5.execute("select * from league WHERE name = 'Veikkausliiga'")
+            results5 = cursor5.fetchall()
+            self.textbox.insert("1.0", results5)
+        elif self.optionmenu_1.get() == "World Cup":
+            cursor6 = conn.cursor()
+            cursor6.execute("select * from league WHERE name = 'World Cup'")
+            results6 = cursor6.fetchall()
+            self.textbox.insert("1.0", results6)
+        elif self.optionmenu_1.get() == "Euro Cup":
+            cursor7 = conn.cursor()
+            cursor7.execute("select * from league WHERE name = 'Euro Cup'")
+            results7 = cursor7.fetchall()
+            self.textbox.insert("1.0", results7)
+        elif self.optionmenu_1.get() == "LaLiga":
+            cursor8 = conn.cursor()
+            cursor8.execute("select * from league WHERE name = 'LaLiga'")
+            results8 = cursor8.fetchall()
+            self.textbox.insert("1.0", results8)
+        elif self.optionmenu_1.get() == "Bundesliga":
+            cursor9 = conn.cursor()
+            cursor9.execute("select * from league WHERE name = 'Bundesliga'")
+            results9 = cursor9.fetchall()
+            self.textbox.insert("1.0", results9)
+        elif self.optionmenu_1.get() == "Champions League":
+            cursor10 = conn.cursor()
+            cursor10.execute("select * from league WHERE name = 'Champions League'")
+            results10 = cursor10.fetchall()
+            self.textbox.insert("1.0", results10)
+        elif self.optionmenu_1.get() == "Allsvenskan":
+            cursor11 = conn.cursor()
+            cursor11.execute("select * from league WHERE name = 'Allsvenskan'")
+            results11 = cursor11.fetchall()
+            self.textbox.insert("1.0", results11)
+
+        else:
+            self.empty_event()
+
+    def empty_event(self):
         cursor1 = conn.cursor()
         cursor1.execute("select * from league")
-        results = cursor1.fetchall()
+        results1 = cursor1.fetchall()
         formatted_results = ""
-        for row in results:
+        for row in results1:
             formatted_results += f"ID: {row[0]}\nLeague: {row[1]}\nSeason: {row[2]}\nTrophy: {row[3]}\n\n"
         self.textbox.insert("1.0", formatted_results)
-        
+
 
 # Connect to database
 conn = psycopg2.connect(
