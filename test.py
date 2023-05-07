@@ -135,60 +135,110 @@ class App(customtkinter.CTk):
         new_scaling_float = int(new_scaling.replace("%", "")) / 100
         customtkinter.set_widget_scaling(new_scaling_float)
 
+
+    #TODO: BUNDESLIGA & CHAMPPARI EI TOIMI
+    #EVEnt which will happen when search button is pressed, depends on which option is selected
     def sidebar_button_event(self):
         self.textbox.delete("1.0", "end")
         if self.optionmenu_1.get() == "Serie A":
             cursor2 = conn.cursor()
-            cursor2.execute("select * from league WHERE name = 'Serie A'")
+            cursor2.execute("SELECT league.league_id, league.name, league.teams_amount, league.trophy_name, teams.name FROM league JOIN teams ON teams.league_id = league.league_id WHERE league.name = 'Serie A';")
             results2 = cursor2.fetchall()
-            self.textbox.insert("1.0", results2)
+            league_info = "League ID: {}\nLeague Name: {}\nNumber of Teams: {}\nTrophy Name: {}\n".format(results2[0][0], results2[0][1], results2[0][2], results2[0][3])
+            self.textbox.insert("1.0", league_info)
+            for row in results2:
+                team_info = "{}\n".format(row[4])
+                self.textbox.insert("end", team_info)       
         elif self.optionmenu_1.get() == "Ligue 1":
+            self.textbox.delete("1.0", "end")
             cursor3 = conn.cursor()
-            cursor3.execute("select * from league WHERE name = 'Ligue 1'")
+            cursor3.execute("SELECT league.league_id, league.name, league.teams_amount, league.trophy_name, teams.name FROM league JOIN teams ON teams.league_id = league.league_id WHERE league.name = 'Ligue 1';")
             results3 = cursor3.fetchall()
-            self.textbox.insert("1.0", results3)
-        
+            league_info = "League ID: {}\nLeague Name: {}\nNumber of Teams: {}\nTrophy Name: {}\n".format(results3[0][0], results3[0][1], results3[0][2], results3[0][3])
+            self.textbox.insert("1.0", league_info)
+            for row in results3:
+                team_info = "{}\n".format(row[4])
+                self.textbox.insert("end", team_info)   
         elif self.optionmenu_1.get() == "Premier League":
+            self.textbox.delete("1.0", "end")
             cursor4 = conn.cursor()
-            cursor4.execute("select * from league WHERE name = 'Premier League'")
+            cursor4.execute("SELECT league.league_id, league.name, league.teams_amount, league.trophy_name, teams.name FROM league JOIN teams ON teams.league_id = league.league_id WHERE league.name = 'Premier League';")
             results4 = cursor4.fetchall()
-            self.textbox.insert("1.0", results4)
+            league_info = "League ID: {}\nLeague Name: {}\nNumber of Teams: {}\nTrophy Name: {}\n".format(results4[0][0], results4[0][1], results4[0][2], results4[0][3])
+            self.textbox.insert("1.0", league_info)
+            for row in results4:
+                team_info = "{}\n".format(row[4])
+                self.textbox.insert("end", team_info)   
         elif self.optionmenu_1.get() == "Veikkausliiga":
+            self.textbox.delete("1.0", "end")
             cursor5 = conn.cursor()
-            cursor5.execute("select * from league WHERE name = 'Veikkausliiga'")
+            cursor5.execute("SELECT league.league_id, league.name, league.teams_amount, league.trophy_name, teams.name FROM league JOIN teams ON teams.league_id = league.league_id WHERE league.name = 'Veikkausliiga';")
             results5 = cursor5.fetchall()
-            self.textbox.insert("1.0", results5)
+            league_info = "League ID: {}\nLeague Name: {}\nNumber of Teams: {}\nTrophy Name: {}\n".format(results5[0][0], results5[0][1], results5[0][2], results5[0][3])
+            self.textbox.insert("1.0", league_info)
+            for row in results5:
+                team_info = "{}\n".format(row[4])
+                self.textbox.insert("end", team_info) 
         elif self.optionmenu_1.get() == "World Cup":
+            self.textbox.delete("1.0", "end")
             cursor6 = conn.cursor()
-            cursor6.execute("select * from league WHERE name = 'World Cup'")
+            cursor6.execute("SELECT league.league_id, league.name, league.teams_amount, league.trophy_name, teams.name FROM league JOIN teams ON teams.league_id = league.league_id WHERE league.name = 'World Cup';")
             results6 = cursor6.fetchall()
-            self.textbox.insert("1.0", results6)
+            league_info = "League ID: {}\nLeague Name: {}\nNumber of Teams: {}\nTrophy Name: {}\n".format(results6[0][0], results6[0][1], results6[0][2], results6[0][3])
+            self.textbox.insert("1.0", league_info)
+            for row in results6:
+                team_info = "{}\n".format(row[4])
+                self.textbox.insert("end", team_info) 
         elif self.optionmenu_1.get() == "Euro Cup":
+            self.textbox.delete("1.0", "end")
             cursor7 = conn.cursor()
-            cursor7.execute("select * from league WHERE name = 'Euro Cup'")
+            cursor7.execute("SELECT league.league_id, league.name, league.teams_amount, league.trophy_name, teams.name FROM league JOIN teams ON teams.league_id = league.league_id WHERE league.name = 'Euro Cup';")
             results7 = cursor7.fetchall()
-            self.textbox.insert("1.0", results7)
+            league_info = "League ID: {}\nLeague Name: {}\nNumber of Teams: {}\nTrophy Name: {}\n".format(results7[0][0], results7[0][1], results7[0][2], results7[0][3])
+            self.textbox.insert("1.0", league_info)
+            for row in results7:
+                team_info = "{}\n".format(row[4])
+                self.textbox.insert("end", team_info) 
         elif self.optionmenu_1.get() == "LaLiga":
+            self.textbox.delete("1.0", "end")
             cursor8 = conn.cursor()
-            cursor8.execute("select * from league WHERE name = 'LaLiga'")
+            cursor8.execute("SELECT league.league_id, league.name, league.teams_amount, league.trophy_name, teams.name FROM league JOIN teams ON teams.league_id = league.league_id WHERE league.name = 'LaLiga';")
             results8 = cursor8.fetchall()
-            self.textbox.insert("1.0", results8)
+            league_info = "League ID: {}\nLeague Name: {}\nNumber of Teams: {}\nTrophy Name: {}\n".format(results8[0][0], results8[0][1], results8[0][2], results8[0][3])
+            self.textbox.insert("1.0", league_info)
+            for row in results8:
+                team_info = "{}\n".format(row[4])
+                self.textbox.insert("end", team_info) 
         elif self.optionmenu_1.get() == "Bundesliga":
+            self.textbox.delete("1.0", "end")
             cursor9 = conn.cursor()
-            cursor9.execute("select * from league WHERE name = 'Bundesliga'")
+            cursor9.execute("SELECT league.league_id, league.name, league.teams_amount, league.trophy_name, teams.name FROM league JOIN teams ON teams.league_id = league.league_id WHERE league.name = 'Bundesliga';")
             results9 = cursor9.fetchall()
-            self.textbox.insert("1.0", results9)
+            league_info = "League ID: {}\nLeague Name: {}\nNumber of Teams: {}\nTrophy Name: {}\n".format(results9[0][0], results9[0][1], results9[0][2], results9[0][3])
+            self.textbox.insert("1.0", league_info)
+            for row in results9:
+                team_info = "{}\n".format(row[4])
+                self.textbox.insert("end", team_info) 
         elif self.optionmenu_1.get() == "Champions League":
+            self.textbox.delete("1.0", "end")
             cursor10 = conn.cursor()
-            cursor10.execute("select * from league WHERE name = 'Champions League'")
+            cursor10.execute("SELECT league.league_id, league.name, league.teams_amount, league.trophy_name, teams.name FROM league JOIN teams ON teams.league_id = league.league_id WHERE league.name = 'Champions League';")
             results10 = cursor10.fetchall()
-            self.textbox.insert("1.0", results10)
+            league_info = "League ID: {}\nLeague Name: {}\nNumber of Teams: {}\nTrophy Name: {}\n".format(results10[0][0], results10[0][1], results10[0][2], results10[0][3])
+            self.textbox.insert("1.0", league_info)
+            for row in results10:
+                team_info = "{}\n".format(row[4])
+                self.textbox.insert("end", team_info) 
         elif self.optionmenu_1.get() == "Allsvenskan":
+            self.textbox.delete("1.0", "end")
             cursor11 = conn.cursor()
-            cursor11.execute("select * from league WHERE name = 'Allsvenskan'")
+            cursor11.execute("SELECT league.league_id, league.name, league.teams_amount, league.trophy_name, teams.name FROM league JOIN teams ON teams.league_id = league.league_id WHERE league.name = 'Allsvenskan';")
             results11 = cursor11.fetchall()
-            self.textbox.insert("1.0", results11)
-
+            league_info = "League ID: {}\nLeague Name: {}\nNumber of Teams: {}\nTrophy Name: {}\n".format(results11[0][0], results11[0][1], results11[0][2], results11[0][3])
+            self.textbox.insert("1.0", league_info)
+            for row in results11:
+                team_info = "{}\n".format(row[4])
+                self.textbox.insert("end", team_info) 
         else:
             self.empty_event()
 
