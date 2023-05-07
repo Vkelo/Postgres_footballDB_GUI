@@ -256,8 +256,8 @@ class App(customtkinter.CTk):
 conn = psycopg2.connect(
     host="localhost",
     database="postgres",
-    user="vilikelo",
-    password="password"
+    user="###",
+    password="###"
 )
 
 
