@@ -1,3 +1,4 @@
+import tkinter as tk
 import customtkinter
 import psycopg2
 
@@ -24,11 +25,9 @@ class App(customtkinter.CTk):
         self.sidebar_frame.grid_rowconfigure(4, weight=1)
         self.logo_label = customtkinter.CTkLabel(self.sidebar_frame, text="Pelaajakanta", font=customtkinter.CTkFont(size=20, weight="bold"))
         self.logo_label.grid(row=0, column=0, padx=20, pady=(20, 10))
-        self.sidebar_button_1 = customtkinter.CTkButton(self.sidebar_frame, command=self.sidebar_button_event, text="tämä kanta")
-        self.sidebar_button_1.grid(row=1, column=0, padx=20, pady=10)
-        self.sidebar_button_2 = customtkinter.CTkButton(self.sidebar_frame, command=self.sidebar_button_event, text="nappi")
+        self.sidebar_button_2 = customtkinter.CTkButton(self.sidebar_frame, command=self.show_info_event, text="INFO")
         self.sidebar_button_2.grid(row=2, column=0, padx=20, pady=10)
-        self.sidebar_button_3 = customtkinter.CTkButton(self.sidebar_frame, command=self.sidebar_button_event, text="älä paina tätä")
+        self.sidebar_button_3 = customtkinter.CTkButton(self.sidebar_frame, command=self.sidebar_button_event, text="disabled button")
         self.sidebar_button_3.grid(row=3, column=0, padx=20, pady=10)
         self.appearance_mode_label = customtkinter.CTkLabel(self.sidebar_frame, text="Appearance Mode:", anchor="w")
         self.appearance_mode_label.grid(row=5, column=0, padx=20, pady=(10, 0))
@@ -42,7 +41,7 @@ class App(customtkinter.CTk):
         self.scaling_optionemenu.grid(row=8, column=0, padx=20, pady=(10, 20))
 
         # create main entry and button
-        self.entry = customtkinter.CTkEntry(self, placeholder_text="Hae nimellä")
+        self.entry = customtkinter.CTkEntry(self, placeholder_text="Search player by name")
         self.entry.grid(row=3, column=1, columnspan=2, padx=(20, 0), pady=(20, 20), sticky="nsew")
 
         self.main_button_1 = customtkinter.CTkButton(master=self, fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), text="hae")
@@ -61,9 +60,6 @@ class App(customtkinter.CTk):
         self.optionmenu_1 = customtkinter.CTkOptionMenu(self.tabview.tab("DB SEARCH"), dynamic_resizing=False,
                                                         values=["Serie A", "Ligue 1", "Premier League", "Veikkausliiga", "World Cup", "Euro Cup", "LaLiga", "Bundesliga", "Champions", "Allsvenskan"])
         self.optionmenu_1.grid(row=0, column=0, padx=20, pady=(20, 10))
-        self.combobox_1 = customtkinter.CTkComboBox(self.tabview.tab("DB SEARCH"),
-                                                    values=["joukkue1", "joukku2", "joukkue3"])
-        self.combobox_1.grid(row=1, column=0, padx=20, pady=(10, 10))
 
         self.button_12 = customtkinter.CTkButton(self.tabview.tab("DB SEARCH"), 
                                                 command=self.sidebar_button_event, text="SEARCH")
@@ -94,35 +90,66 @@ class App(customtkinter.CTk):
         self.string_input_button.grid(row=4, column=0, padx=20, pady=(10, 10))
 
         # set default values
-        self.sidebar_button_3.configure(state="disabled", text="Älä paina tätä nappia")
+        self.sidebar_button_3.configure(state="disabled", text="DO NOT PRESS THIS")
         self.appearance_mode_optionemenu.set("Dark")
         self.scaling_optionemenu.set("100%")
         self.optionmenu_1.set("Liigat")
-        self.combobox_1.set("empty")
-        self.textbox.insert("0.0", "Tähän tulee tietoja haetun kohteen attribuuteista\n\n")
+        self.textbox.insert("0.0", "Information about the search will be shown here\n\n")
 
 
 
     # DIALOGS
     def open_input_dialog_event(self):
+        cur = conn.cursor()
         dialog = customtkinter.CTkInputDialog(text="Keyword:", title="SEARCH")
-        print("CTkInputDialog:", dialog.get_input())
+        keyword = dialog.get_input()
+        if keyword is not None:
+            cur.execute("""SELECT * FROM teams
+                        WHERE teams.name LIKE %s""",
+                        (f"%{keyword}%",))
+            result = cur.fetchall()
+            self.textbox.delete("1.0", "end")
+            self.textbox.insert("1.0", result)
+        conn.commit()
+        cur.close()
 
     def open_player_dialog(self):
-        prompts = [("Name of the player:", "Add a player to DB"), 
-               ("Age of the player:", "Add a player to DB"), 
-               ("Position of the player:", "Add a player to DB")]
+        cur = conn.cursor()
+        cur.execute("SELECT MAX(player_id) FROM players")
+        max_id = cur.fetchone()[0]
+        if max_id is None:
+            max_id = 1000
+        player_id = max_id + 1
+        fields = ["Name", "Age", "Position"]
+        dialog = CustomDialog(self, fields, title="Add a player to DB")
+        self.wait_window(dialog)        
+        if dialog.result is not None:
+            name = dialog.result["Name"]
+            age = int(dialog.result["Age (num)"])
+            position = dialog.result["Position"]            
+            cur.execute("INSERT INTO players (player_id, name, age, position) VALUES (%s, %s, %s, %s)", (player_id, name, age, position))
+            conn.commit()
+            cur.close()
 
-        inputs = []
-        for prompt in prompts:
-            dialog = customtkinter.CTkInputDialog(text=prompt[0], title=prompt[1])
-            inputs.append(dialog.get_input())
-    
-        print("Inputs:", inputs)
 
     def open_team_dialog(self):
-        dialog = customtkinter.CTkInputDialog(text="Name of the team:", title="Add a team to DB")
-        print("CTkInputDialog:", dialog.get_input())
+        cur = conn.cursor()
+        cur.execute("SELECT MAX(team_id) FROM teams")
+        max_id = cur.fetchone()[0]
+        if max_id is None:
+            max_id = 160
+        team_id = max_id + 1
+        fields = ["Name", "City", "Country", "Leagueid"]
+        dialog = CustomDialog(self, fields, title="Add a team to DB")
+        self.wait_window(dialog)        
+        if dialog.result is not None:
+            name = dialog.result["Name"]
+            city = dialog.result["City"]
+            country = dialog.result["Country"] 
+            league_id = dialog.result["Leagueid"] 
+            cur.execute("INSERT INTO teams (team_id, league_id, name, city, country) VALUES (%s, %s, %s, %s, %s)", (team_id, league_id, name, city, country))
+            conn.commit()
+            cur.close()
 
     def open_match_dialog(self):
         dialog = customtkinter.CTkInputDialog(text="Your comment:", title="Add comment on the team")
@@ -251,15 +278,69 @@ class App(customtkinter.CTk):
             formatted_results += f"ID: {row[0]}\nLeague: {row[1]}\nSeason: {row[2]}\nTrophy: {row[3]}\n\n"
         self.textbox.insert("1.0", formatted_results)
 
+    def show_info_event(self):
+        info_window = InfoWindow(self)
+        info_window.geometry("400x300+100+100")
+        info_window.grab_set() # Make the window modal
+        info_window.wait_window() # Wait for the window to close
+
 
 # Connect to database
 conn = psycopg2.connect(
     host="localhost",
     database="postgres",
-    user="###",
-    password="###"
+    user="vilikelo",
+    password="password"
 )
 
+
+
+class InfoWindow(tk.Toplevel):
+    def __init__(self, master=None):
+        super().__init__(master)
+        self.title("Info")
+        self.label = tk.Label(self, text="V.1.0, Vkelo, 08.06.2023.")
+        self.label.pack()
+        self.text = tk.Text(self)
+        self.text.insert(tk.END, "This database contains information about ten football leagues, 16 teams from each league and made up players of teams.\n\n")
+        self.text.insert(tk.END, "Made with python and customkinter GUI library")
+        self.text.pack()
+
+
+
+class CustomDialog(tk.Toplevel):
+    def __init__(self, parent, fields, title="Custom Dialog"):
+        super().__init__(parent)
+        self.title(title)
+        
+        self.entries = {}
+        for i, field in enumerate(fields):
+            label = tk.Label(self, text=field)
+            label.grid(row=i, column=0, padx=5, pady=5, sticky="w")
+            
+            entry = tk.Entry(self)
+            entry.grid(row=i, column=1, padx=5, pady=5, sticky="we")
+            self.entries[field] = entry
+            
+        button_frame = tk.Frame(self)
+        button_frame.grid(row=len(fields), column=1, padx=5, pady=5, sticky="e")
+        
+        ok_button = tk.Button(button_frame, text="OK", command=self.ok)
+        ok_button.pack(side="right", padx=5)
+        
+        cancel_button = tk.Button(button_frame, text="Cancel", command=self.cancel)
+        cancel_button.pack(side="right", padx=5)
+        
+        self.result = None
+        
+    def ok(self):
+        self.result = {}
+        for field, entry in self.entries.items():
+            self.result[field] = entry.get()
+        self.destroy()
+        
+    def cancel(self):
+        self.destroy()
 
 
 if __name__ == "__main__":
