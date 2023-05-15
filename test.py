@@ -175,12 +175,36 @@ class App(customtkinter.CTk):
             cur.close()
 
     def search_team_event(self):
-        cur = conn.cursor()
-        dialog = customtkinter.CTkInputDialog(text="team name:", title="SEARCH")
-        cur.execute("SELECT MAX(team_id) FROM teams")
+        dialog = customtkinter.CTkInputDialog(text="Team name:", title="SEARCH")
+        team_name = dialog.get_input() 
+        if team_name:
+            cur = conn.cursor()
+            query = "SELECT * FROM teams WHERE name = %s"
+            cur.execute(query, (team_name,))
+            result = cur.fetchone()
+            if result:
+                team_id, team_name = result[0], result[1]
+                self.textbox.delete("1.0", "end")
+                self.textbox.insert("1.0", f"Team found - ID: {team_id}, Name: {team_name}\n")
 
-        conn.commit()
-        cur.close()
+                # Retrieve players for the team
+                player_query = "SELECT * FROM players WHERE team_id = %s"
+                cur.execute(player_query, (team_id,))
+                players = cur.fetchall()
+
+                if players:
+                    self.textbox.insert("end", "Players:\n")
+                    for player in players:
+                        player_id, player_name = player[0], player[1]
+                        self.textbox.insert("end", f"Player ID: {player_id}, Name: {player_name}\n")
+                else:
+                    self.textbox.insert("end", "No players found for this team.\n")
+            else:
+                self.textbox.delete("1.0", "end")
+                self.textbox.insert("1.0", "Team not found")
+            
+            conn.commit()
+            cur.close()
 
 
     def open_match_dialog(self):
